@@ -15,7 +15,9 @@ class NoteController extends Controller
     public function index()
     {
 
-        $notes = Note::where('user_id', Auth::id())->latest('updated_at')->paginate(5);
+        // $notes = Note::where('user_id', Auth::id())->latest('updated_at')->paginate(5);
+        // $notes = Auth::user()->notes()->latest('updated_at')->paginate(5);
+        $notes = Note::whereBelongsTo(Auth::user())->latest('updated_at')->paginate(5);
         return view('notes.index')->with('notes', $notes);
 
     }
@@ -93,14 +95,20 @@ class NoteController extends Controller
             'text'  => $request->text
         ]);
 
-        return to_route('notes.show', $note);
+        return to_route('notes.show', $note)->with('success', 'Note deleted successfully');
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Note $note)
     {
-        //
+        if($note->user_id != Auth::id()){
+            return abort(403);
+        }
+
+        $note->delete();
+
+        return to_route('notes.index')->with('success', 'Note updated successfully');
     }
 }

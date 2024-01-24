@@ -2,8 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Note extends Model
 {
@@ -15,5 +16,10 @@ class Note extends Model
     {
         return 'uuid';
     }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
+
 
 }
