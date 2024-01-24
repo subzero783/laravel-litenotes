@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Note;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -32,15 +33,33 @@ class NoteController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|max:120',
+            'text'  => 'required'
+        ]);
+
+        Note::create([
+            'uuid'    => Str::uuid(),
+            'user_id' => Auth::id(),
+            'title'   => $request->title,
+            'text'    => $request->text
+        ]);
+
+        return to_route('notes.index');
+
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Note $note)
     {
-        //
+
+        if($note->user_id != Auth::id()){
+            return abort(403);
+        }
+
+        return view('notes.show')->with('note', $note);
     }
 
     /**
